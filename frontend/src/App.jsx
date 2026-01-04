@@ -1,35 +1,116 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { GamificationProvider } from "./contexts/GamificationContext";
+import { RewardAnimation } from "./components/gamification/RewardAnimation";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import CreateCourse from "./pages/CreateCourse";
+import CourseView from "./pages/CourseView";
+import Students from "./pages/Students";
+import YourSite from "./pages/YourSite";
+import Sales from "./pages/Sales";
+import Emails from "./pages/Emails";
+import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
+import YourPlan from "./pages/YourPlan";
+import Support from "./pages/Support";
+import Achievements from "./pages/Achievements";
+import NotFound from "./pages/NotFound";
+import { QuizProvider } from "./contexts/QuizContext";
+import Quizzes from "./pages/Quizzes";
+import QuizTake from "./pages/QuizTake";
 
-function App() {
-  const [count, setCount] = useState(0)
+const queryClient = new QueryClient();
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// Protected Route Component - for authenticated users
+function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
-export default App
+// Admin-only Route Component
+function AdminRoute({ children }) {
+  const { user, isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  if (user?.role !== 'admin') return <Navigate to="/achievements" />;
+  
+  return children;
+}
+
+function AppRoutes() {
+  const { isAuthenticated, user } = useAuth();
+
+  return (
+    <Routes>
+      {/* Public Routes - redirect to appropriate page if already logged in */}
+      <Route 
+        path="/login" 
+        element={
+          isAuthenticated 
+            ? <Navigate to={user?.role === 'student' ? '/achievements' : '/'} /> 
+            : <Login />
+        } 
+      />
+      <Route 
+        path="/signup" 
+        element={
+          isAuthenticated 
+            ? <Navigate to={user?.role === 'student' ? '/achievements' : '/'} /> 
+            : <Signup />
+        } 
+      />
+      
+      {/* Admin-only Routes */}
+      <Route path="/" element={<AdminRoute><Dashboard /></AdminRoute>} />
+      <Route path="/create-course" element={<AdminRoute><CreateCourse /></AdminRoute>} />
+      <Route path="/course/:id" element={<AdminRoute><CourseView /></AdminRoute>} />
+      <Route path="/students" element={<AdminRoute><Students /></AdminRoute>} />
+      <Route path="/your-site" element={<AdminRoute><YourSite /></AdminRoute>} />
+      <Route path="/sales" element={<AdminRoute><Sales /></AdminRoute>} />
+      <Route path="/emails" element={<AdminRoute><Emails /></AdminRoute>} />
+      <Route path="/settings" element={<AdminRoute><Settings /></AdminRoute>} />
+      
+      {/* Routes accessible by all authenticated users */}
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/your-plan" element={<ProtectedRoute><YourPlan /></ProtectedRoute>} />
+      <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+      <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
+      <Route path="/quizzes" element={<ProtectedRoute><Quizzes /></ProtectedRoute>} />
+      <Route path="/quiz/:id" element={<ProtectedRoute><QuizTake /></ProtectedRoute>} />
+      
+      {/* 404 Page */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
+const App = () => (
+
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <QuizProvider>
+        <GamificationProvider>
+           <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <RewardAnimation />
+          <BrowserRouter future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+        </GamificationProvider>
+      </QuizProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
+
+export default App;
