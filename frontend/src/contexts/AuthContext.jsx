@@ -1,54 +1,59 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import authService from '../services/authService'; // <--- The bridge file we made earlier
 
-const AuthContext = createContext(undefined);
+const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+export function useAuth() {
+  return useContext(AuthContext);
+}
 
-  const login = (email, password, role) => {
-    // Simulate login - replace with actual API call
-    const userData = {
-      email,
-      role, // 'student' or 'admin'
-      name: email.split('@')[0],
-    };
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(userData));
-    return userData;
+// ✅ Change AuthProvider to DEFAULT export
+
+export default function AuthProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+ 
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      setCurrentUser(JSON.parse(user));
+    }
+    setLoading(false);
+  }, []);
+
+  const signup = async (name, email, password, role) => {
+   
+    const data = await authService.register({ name, email, password, role });
+    // Update State
+    setCurrentUser(data); 
+    return data;
   };
 
-  const signup = (name, email, password, role) => {
-    // Simulate signup - replace with actual API call
-    const userData = {
-      name,
-      email,
-      role,
-    };
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(userData));
-    return userData;
+
+  const login = async (email, password , role ) => {
+    const data = await authService.login({ email, password, role});
+    setCurrentUser(data);
+    return data;
   };
 
+  
   const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('user');
+    authService.logout();
+    setCurrentUser(null);
+  };
+
+  const value = {
+    currentUser,
+    signup,
+    login,
+    isAuthenticated: !!currentUser,
+    logout
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, signup, logout }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 }

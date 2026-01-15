@@ -19,7 +19,7 @@ export default function Signup() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -36,15 +36,25 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      await signup(name, email, password, selectedRole);
-      navigate('/');
+      const backendRole = selectedRole === 'student' ? 'KID' : 'ADMIN';
+      
+
+      await signup(name, email, password, backendRole);
+    
+      if (backendRole === 'ADMIN') {
+        navigate('/');
+      } else {
+        navigate('/achievements'); // or /map for the kid
+      }
+      
     } catch (err) {
-      setError('Failed to create account. Please try again.');
+     
+      const errorMessage = err.response?.data?.message || 'Failed to create account. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">

@@ -3,9 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import  AuthProvider , { useAuth } from "./contexts/AuthContext";
 import { GamificationProvider } from "./contexts/GamificationContext";
 import { RewardAnimation } from "./components/gamification/RewardAnimation";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
@@ -49,22 +51,35 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public Routes - redirect to appropriate page if already logged in */}
-      <Route 
-        path="/login" 
-        element={
-          isAuthenticated 
-            ? <Navigate to={user?.role === 'student' ? '/achievements' : '/'} /> 
-            : <Login />
-        } 
-      />
-      <Route 
-        path="/signup" 
-        element={
-          isAuthenticated 
-            ? <Navigate to={user?.role === 'student' ? '/achievements' : '/'} /> 
-            : <Signup />
-        } 
-      />
+ 
+<Route 
+  path="/login" 
+  element={
+    isAuthenticated 
+      // CHANGE 'student' TO 'KID' HERE
+      ? <Navigate to={user?.role === 'KID' ? '/achievements' : '/'} /> 
+      : <Login />
+  } 
+/>
+<Route 
+  path="/signup" 
+  element={
+    isAuthenticated 
+      // AND HERE
+      ? <Navigate to={user?.role === 'KID' ? '/achievements' : '/'} /> 
+      : <Signup />
+  } 
+/>
+<Route 
+    path="/forgot-password" 
+    element={isAuthenticated ? <Navigate to="/achievements" /> : <ForgotPassword />} 
+  />
+
+  {/* The ":token" tells React that this part of the URL changes for every user */}
+  <Route 
+    path="/reset-password/:token" 
+    element={isAuthenticated ? <Navigate to="/achievements" /> : <ResetPassword />} 
+  />
       
       {/* Admin-only Routes */}
       <Route path="/" element={<AdminRoute><Dashboard /></AdminRoute>} />

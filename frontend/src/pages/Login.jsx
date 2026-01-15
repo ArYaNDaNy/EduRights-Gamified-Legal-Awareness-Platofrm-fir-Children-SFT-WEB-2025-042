@@ -23,10 +23,21 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(email, password, selectedRole);
-      navigate('/');
+
+      const backendRole = selectedRole === 'student' ? 'KID' : 'ADMIN';
+      
+      await login(email, password, backendRole);
+      
+      
+      if (backendRole === 'ADMIN') {
+        navigate('/'); 
+      } else {
+        navigate('/achievements'); 
+      }
+
     } catch (err) {
-      setError('Invalid email or password');
+      console.error(err);
+      setError('Invalid email, password, or role selection');
     } finally {
       setLoading(false);
     }
