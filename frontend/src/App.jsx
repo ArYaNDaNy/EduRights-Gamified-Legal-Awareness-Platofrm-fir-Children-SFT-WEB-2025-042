@@ -8,7 +8,8 @@ import { GamificationProvider } from "./contexts/GamificationContext";
 import { RewardAnimation } from "./components/gamification/RewardAnimation";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard"; // Admin Dashboard
+import StudentDashboard from "./pages/StudentDashboard"; // Student Dashboard
 import CreateCourse from "./pages/CreateCourse";
 import CourseView from "./pages/CourseView";
 import Students from "./pages/Students";
@@ -38,36 +39,32 @@ function AdminRoute({ children }) {
   const { user, isAuthenticated } = useAuth();
   
   if (!isAuthenticated) return <Navigate to="/login" />;
-  if (user?.role !== 'admin') return <Navigate to="/achievements" />;
+  if (user?.role !== 'admin') return <Navigate to="/student-dashboard" />;
   
   return children;
 }
 
-function AppRoutes() {
-  const { isAuthenticated, user } = useAuth();
+// Role-aware Root Route
+function HomeRoute() {
+  const { user, isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  if (user?.role === 'student') return <StudentDashboard />;
+  return <Dashboard />;
+}
 
+function AppRoutes() {
   return (
     <Routes>
-      {/* Public Routes - redirect to appropriate page if already logged in */}
-      <Route 
-        path="/login" 
-        element={
-          isAuthenticated 
-            ? <Navigate to={user?.role === 'student' ? '/achievements' : '/'} /> 
-            : <Login />
-        } 
-      />
-      <Route 
-        path="/signup" 
-        element={
-          isAuthenticated 
-            ? <Navigate to={user?.role === 'student' ? '/achievements' : '/'} /> 
-            : <Signup />
-        } 
-      />
+      {/* Public Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      
+      {/* Role-aware Home Route */}
+      <Route path="/" element={<HomeRoute />} />
+      <Route path="/student-dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
       
       {/* Admin-only Routes */}
-      <Route path="/" element={<AdminRoute><Dashboard /></AdminRoute>} />
       <Route path="/create-course" element={<AdminRoute><CreateCourse /></AdminRoute>} />
       <Route path="/course/:id" element={<AdminRoute><CourseView /></AdminRoute>} />
       <Route path="/students" element={<AdminRoute><Students /></AdminRoute>} />
@@ -91,22 +88,21 @@ function AppRoutes() {
 }
 
 const App = () => (
-
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <QuizProvider>
         <GamificationProvider>
-           <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <RewardAnimation />
-          <BrowserRouter future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true
-          }}>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <RewardAnimation />
+            <BrowserRouter future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}>
+              <AppRoutes />
+            </BrowserRouter>
+          </TooltipProvider>
         </GamificationProvider>
       </QuizProvider>
     </AuthProvider>
