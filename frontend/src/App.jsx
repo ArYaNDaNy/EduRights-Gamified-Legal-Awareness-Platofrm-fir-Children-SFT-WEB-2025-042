@@ -29,18 +29,27 @@ import QuizTake from "./pages/QuizTake";
 
 const queryClient = new QueryClient();
 
-// Protected Route Component - for authenticated users
+
 function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+ 
+  if (loading) return <div>Loading...</div>; 
+
   return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
-// Admin-only Route Component
 function AdminRoute({ children }) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   
+  if (loading) return <div>Loading...</div>;
+
   if (!isAuthenticated) return <Navigate to="/login" />;
-  if (user?.role !== 'admin') return <Navigate to="/achievements" />;
+
+ 
+  if (user?.role !== 'ADMIN') {
+    return <Navigate to="/achievements" />; 
+  }
   
   return children;
 }
