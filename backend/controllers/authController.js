@@ -17,7 +17,7 @@ const registerUser = async (req,res)=>{
     try{
     let userExists = await User.findOne({email});
     if(userExists){
-        res.status(400).json({message:'User already exists'});
+       return res.status(400).json({message:'User already exists'});
     }
     //hash password
     let salt = await bcrypt.genSalt(10);
@@ -41,7 +41,7 @@ const registerUser = async (req,res)=>{
         await user.save();
 
         // 6. Send Response
-        res.status(201).json({
+       return res.status(201).json({
             _id: user._id,
             name: user.name,
             email: user.email,
@@ -54,7 +54,7 @@ const registerUser = async (req,res)=>{
     
 catch(err){
     console.error('Error in registrating User',err)
-    res.status(500).json({message:'Server Error'})
+    return res.status(500).json({message:'Server Error'})
 }
 }
 //login User
@@ -68,7 +68,7 @@ const loginUser = async (req,res)=>{
     },'+password');
 
     if(user && (await bcrypt.compare(password,user.password))){
-        res.json({
+       return res.json({
             _id:user._id,
             name:user.name,
             email:user.email,
@@ -78,12 +78,12 @@ const loginUser = async (req,res)=>{
         })
     }
     else{
-        res.status(401).json({message:'Invalid email or password'});
+       return res.status(401).json({message:'Invalid email or password'});
     }
 }
 catch(err){
     console.error('Error in login user',err);
-    res.status(500).json({message:'Server Error'});
+  return  res.status(500).json({message:'Server Error'});
 }
 }
 
