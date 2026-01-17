@@ -1,6 +1,7 @@
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { User } from "lucide-react";
-
+import { useEffect,useState } from "react";
+import axios from "axios";
 const data = [
   { month: "Jan", students: 5 },
   { month: "Feb", students: 8 },
@@ -17,12 +18,27 @@ const data = [
 ];
 
 export function StudentsChart() {
+  const [totalStudents ,settotalStudents] = useState(0)
+  useEffect(()=>{
+    const fetchTotalstudents = async ()=>{
+      console.log("fetching students")
+      try{
+        const res = await axios.get("http://localhost:5000/api/users/students/count");
+        
+        settotalStudents(res.data.totalStudents)
+      }
+      catch(error){
+        console.log(error)
+      }
+      
+    }
+ fetchTotalstudents(); },[])
   return (
     <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
       <h3 className="text-lg font-semibold text-foreground mb-4">Students Registered</h3>
       <div className="flex items-center gap-2 mb-4">
         <User className="w-4 h-4 text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">48 students</span>
+        <span className="text-sm text-muted-foreground">{totalStudents}</span>
       </div>
       <div className="h-48">
         <ResponsiveContainer width="100%" height="100%">
