@@ -11,7 +11,8 @@ import {
   LogOut,
   Plus,
   Trophy,
-  BookOpen 
+  BookOpen,
+  Home
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,6 +25,8 @@ const studentNavItems = [
 
 // Admin/Teacher navigation items
 const adminNavItems = [
+
+  { title: "Home", href: "/", icon: Home },
   { title: "Students", href: "/students", icon: Users },
   { title: "Your Site", href: "/your-site", icon: Globe },
   { title: "Sales", href: "/sales", icon: DollarSign },

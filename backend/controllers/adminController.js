@@ -54,3 +54,88 @@ exports.deleteStudent = async (req, res) => {
   }
 };
 
+const { LegalModule } = require('../models/Content');
+
+exports.createModule = async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      badge_icon,
+      badge_title,
+      learning_summary,
+      time_estimate_minutes,
+      completion_bonus_xp,
+    } = req.body;
+
+    const module = await LegalModule.create({
+      title,
+      description,
+      badge_icon,
+      badge_title,
+      learning_summary,
+      time_estimate_minutes,
+      completion_bonus_xp,
+    });
+
+    res.status(201).json({
+      success: true,
+      module
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create module'
+    });
+  }
+};
+
+
+const { Level } = require('../models/Content');
+
+exports.createLevel = async (req, res) => {
+  try {
+    const {
+      module_id,
+      level_number,
+      title,
+      video_id,
+      xp_reward,
+      difficulty
+    } = req.body;
+
+    // Prevent duplicate 
+    const existingLevel = await Level.findOne({
+      module_id,
+      level_number
+    });
+
+    if (existingLevel) {
+      return res.status(400).json({
+        success: false,
+        message: 'Level number already exists for this module'
+      });
+    }
+
+    const level = await Level.create({
+      module_id,
+      level_number,
+      title,
+      video_id,
+      xp_reward,
+      difficulty
+    });
+
+    res.status(201).json({
+      success: true,
+      level
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create level'
+    });
+  }
+};

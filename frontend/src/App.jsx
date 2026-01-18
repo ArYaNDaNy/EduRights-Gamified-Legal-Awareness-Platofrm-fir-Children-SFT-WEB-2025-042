@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +27,9 @@ import NotFound from "./pages/NotFound";
 import { QuizProvider } from "./contexts/QuizContext";
 import Quizzes from "./pages/Quizzes";
 import QuizTake from "./pages/QuizTake";
+import CreateLevels from "./pages/CreateLevels";
+import ModuleDetails from "./pages/ModuleDetails";
+
 
 const queryClient = new QueryClient();
 
@@ -99,6 +103,9 @@ function AppRoutes() {
       <Route path="/sales" element={<AdminRoute><Sales /></AdminRoute>} />
       <Route path="/emails" element={<AdminRoute><Emails /></AdminRoute>} />
       <Route path="/settings" element={<AdminRoute><Settings /></AdminRoute>} />
+      <Route path="/admin/modules/:moduleId/levels" element={<AdminRoute><CreateLevels /></AdminRoute>} />
+      <Route path="/modules/:moduleId" element={<AdminRoute><ModuleDetails /></AdminRoute>} />
+
       
       {/* Routes accessible by all authenticated users */}
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
