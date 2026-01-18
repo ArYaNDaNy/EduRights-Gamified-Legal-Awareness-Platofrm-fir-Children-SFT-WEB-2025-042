@@ -30,6 +30,8 @@ import QuizTake from "./pages/QuizTake";
 import CreateLevels from "./pages/CreateLevels";
 import ModuleDetails from "./pages/ModuleDetails";
 
+import Explore from "./pages/Explore";
+import CategoryView from "./pages/CategoryView"
 
 const queryClient = new QueryClient();
 
@@ -109,6 +111,8 @@ function AppRoutes() {
       
       {/* Routes accessible by all authenticated users */}
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
+      <Route path="/explore/:categoryId" element={<ProtectedRoute><CategoryView /></ProtectedRoute>} />
       <Route path="/your-plan" element={<ProtectedRoute><YourPlan /></ProtectedRoute>} />
       <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
       <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
