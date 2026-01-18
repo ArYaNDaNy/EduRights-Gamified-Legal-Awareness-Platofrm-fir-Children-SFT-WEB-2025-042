@@ -4,9 +4,6 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { StudentsChart } from "@/components/dashboard/StudentsChart";
 import { TimeDataChart } from "@/components/dashboard/TimeDataChart";
 import { CourseCard } from "@/components/dashboard/CourseCard";
-import { XPProgressBar } from "@/components/gamification/XPProgressBar";
-import { BadgesGrid } from "@/components/gamification/BadgesGrid";
-import { PointsDisplay } from "@/components/gamification/PointsDisplay";
 
 const courses = [
   {
@@ -45,20 +42,6 @@ export default function Dashboard() {
       <div className="p-8 animate-fade-in">
         <h1 className="text-3xl font-bold text-foreground mb-8">Dashboard</h1>
         
-        {/* Gamification Stats */}
-        <div className="mb-8">
-          <PointsDisplay />
-        </div>
-
-        {/* XP Progress */}
-        <div className="mb-8">
-          <XPProgressBar />
-        </div>
-
-        {/* Badges */}
-        <div className="mb-8">
-          <BadgesGrid limit={6} />
-        </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -67,13 +50,7 @@ export default function Dashboard() {
             <div className="flex-1">
               <TimeDataChart />
             </div>
-            <div className="hidden xl:flex items-end">
-              <img 
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=300&fit=crop"
-                alt="Illustration"
-                className="h-64 object-contain rounded-lg"
-              />
-            </div>
+         
           </div>
         </div>
 

@@ -1,6 +1,8 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { DollarSign, TrendingUp, ShoppingCart, Users } from "lucide-react";
+import { useState,useEffect } from "react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import axios from "axios"
 
 const salesData = [
   { month: "Jan", sales: 1200 },
@@ -18,6 +20,21 @@ const recentSales = [
 ];
 
 export default function Sales() {
+
+  const [totalStudents ,settotalStudents] = useState(0)
+  useEffect(()=>{
+    const fetchstudents = async ()=>{
+      try{
+        console.log("Fetching students")
+        const res = await axios.get("http://localhost:5000/api/users/students/count")
+        settotalStudents(res.data.totalStudents)
+        console.log(totalStudents)
+      }
+      catch(error){
+        console.log(error)
+      }
+    }
+ fetchstudents(); },[])
   return (
     <DashboardLayout>
       <div className="p-8 animate-fade-in">
@@ -68,7 +85,7 @@ export default function Sales() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Customers</p>
-                <p className="text-2xl font-bold text-foreground">48</p>
+                <p className="text-2xl font-bold text-foreground">{totalStudents}</p>
               </div>
             </div>
           </div>
